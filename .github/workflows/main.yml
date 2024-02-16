@@ -1,4 +1,4 @@
-name: Build and push to aws
+name: Build and push to AWS
 
 on:
   push:
@@ -10,33 +10,33 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Setup .NET SDK
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: '6.0'
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '6.0'
 
-    - name: Restore dependencies
-      run: dotnet restore
+      - name: Restore dependencies
+        run: dotnet restore
 
-    - name: Install Swashbuckle.AspNetCore
-      run: dotnet add package Swashbuckle.AspNetCore --version 6.2.3
+      - name: Install Swashbuckle.AspNetCore
+        run: dotnet add package Swashbuckle.AspNetCore --version 6.2.3
 
-    - name: Build project
-      run: dotnet build --configuration Release --no-restore
+      - name: Build project
+        run: dotnet build --configuration Release --no-restore
 
-    - name: Publish project
-      run: dotnet publish -c Release -o ./publish
+      - name: Publish project
+        run: dotnet publish -c Release -o ./publish
 
-    - name: Deploy to AWS Elastic Beanstalk
-      uses: einaregilsson/beanstalk-deploy@v21
-      with:
-        aws_access_key: ${{ secrets.AWS_KEY_ID }}
-        aws_secret_key: ${{ secrets.AWS_KEY_ID_ }}
-        application_name: apiprojket
-        environment_name: Apiprojket-env
-        version_label: ${{ github.run_id }}
-        region: eu-north-1
-        deployment_package: ./publish/MyApp.zip
+      - name: Deploy to AWS Elastic Beanstalk
+        uses: einaregilsson/beanstalk-deploy@v21
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_ID_ }}
+          application_name: apiprojket
+          environment_name: Apiprojket-env
+          version_label: ${{ github.run_id }}
+          region: eu-north-1
+          deployment_package: ./publish 
