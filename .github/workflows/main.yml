@@ -38,8 +38,8 @@ jobs:
         with:
           aws_access_key: ${{ secrets.AWS_KEY_ID}}
           aws_secret_key: ${{ secrets.AWS_KEY_ID_}}
-          application_name: apiprojket
-          environment_name: Apiprojket-env
+          application_name: acalculator api
+          environment_name: Calculatorapi-env
           version_label: ${{ github.run_id }}
           region: eu-north-1
           deployment_package: site.zip
