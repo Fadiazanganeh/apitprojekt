@@ -30,6 +30,9 @@ jobs:
       - name: Publish project
         run: dotnet publish -c Release -o ./publish
 
+      - name: Create deployment package
+        run: cd publish && zip -r ../site.zip .
+
       - name: Deploy to AWS Elastic Beanstalk
         uses: einaregilsson/beanstalk-deploy@v21
         with:
@@ -39,4 +42,4 @@ jobs:
           environment_name: Apiprojket-env
           version_label: ${{ github.run_id }}
           region: eu-north-1
-          deployment_package: ./publish
+          deployment_package: site.zip
