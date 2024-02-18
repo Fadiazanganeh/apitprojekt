@@ -1,5 +1,8 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Http;
+using System;
 using System.Text;
 using System.Linq;
 
@@ -7,42 +10,59 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Lägg till Swagger
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+});
 
 var app = builder.Build();
 
 // Använd Swagger
 app.UseSwagger();
-app.UseSwaggerUI();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+});
 
 // Definiera tillåtna ord
 var allowedWords = new[] { "hamburger", "tacos", "fries", "icecream", "candy", "popcorn" };
 
 // Kryptera endpoint
-app.MapPost("/encrypt", (string text) => {
+app.MapPost("/encrypt", async (HttpContext context) =>
+{
+    var text = await new StreamReader(context.Request.Body).ReadToEndAsync();
     if (string.IsNullOrEmpty(text) || !allowedWords.Contains(text.ToLower()))
     {
-        return Results.BadRequest("Text is either empty or not allowed.");
+        context.Response.StatusCode = StatusCodes.Status400BadRequest;
+        await context.Response.WriteAsync("Text is either empty or not allowed.");
+        return;
     }
 
     var encryptedText = Convert.ToBase64String(Encoding.UTF8.GetBytes(text));
-    return Results.Ok(new { encryptedText });
+    context.Response.StatusCode = StatusCodes.Status200OK;
+    await context.Response.WriteAsJsonAsync(new { encryptedText });
 });
 
 // Avkryptera endpoint
-app.MapPost("/decrypt", (string encryptedText) => {
+app.MapPost("/decrypt", async (HttpContext context) =>
+{
+    var encryptedText = await new StreamReader(context.Request.Body).ReadToEndAsync();
     try
     {
         var decryptedText = Encoding.UTF8.GetString(Convert.FromBase64String(encryptedText));
         if (!allowedWords.Contains(decryptedText.ToLower()))
         {
-            return Results.BadRequest("Decrypted text is not allowed.");
+            context.Response.StatusCode = StatusCodes.Status400BadRequest;
+            await context.Response.WriteAsync("Decrypted text is not allowed.");
+            return;
         }
-        return Results.Ok(new { decryptedText });
+        context.Response.StatusCode = StatusCodes.Status200OK;
+        await context.Response.WriteAsJsonAsync(new { decryptedText });
     }
     catch
     {
-        return Results.BadRequest("Invalid encrypted text format.");
+        context.Response.StatusCode = StatusCodes.Status400BadRequest;
+        await context.Response.WriteAsync("Invalid encrypted text format.");
     }
 });
 
