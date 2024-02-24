@@ -27,16 +27,17 @@ app.UseSwaggerUI(c =>
 // Definiera tillåtna ord
 var allowedWords = new[] { "hamburger", "tacos", "fries", "icecream", "candy", "popcorn" };
 
-// Kryptera endpoint
-app.MapGet("/encrypt", async (HttpContext context) =>
+// Krypterar endpoint
+app.MapPost("/encrypt", (EncryptionService encryptionService, string plaintext) =>
 {
-    var text = await new StreamReader(context.Request.Body).ReadToEndAsync();
-    if (string.IsNullOrEmpty(text) || !allowedWords.Contains(text.ToLower()))
-    {
-        context.Response.StatusCode = StatusCodes.Status400BadRequest;
-        await context.Response.WriteAsync("Text is either empty or not allowed.");
-        return;
-    }
+    return Results.Ok(new { encryptedText = encryptionService.Encrypt(plaintext) });
+});
+
+// Avkrypterar endpoint
+app.MapPost("/decrypt", (EncryptionService encryptionService, string encryptedText) =>
+{
+    return Results.Ok(new { decryptedText = encryptionService.Decrypt(encryptedText) });
+});
 
     var encryptedText = Convert.ToBase64String(Encoding.UTF8.GetBytes(text));
     context.Response.StatusCode = StatusCodes.Status200OK;
