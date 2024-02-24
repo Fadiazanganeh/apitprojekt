@@ -28,7 +28,7 @@ app.UseSwaggerUI(c =>
 var allowedWords = new[] { "hamburger", "tacos", "fries", "icecream", "candy", "popcorn" };
 
 // Kryptera endpoint
-app.MapPost("/encrypt", async (HttpContext context) =>
+app.MapGet("/encrypt", async (HttpContext context) =>
 {
     var text = await new StreamReader(context.Request.Body).ReadToEndAsync();
     if (string.IsNullOrEmpty(text) || !allowedWords.Contains(text.ToLower()))
@@ -44,7 +44,7 @@ app.MapPost("/encrypt", async (HttpContext context) =>
 });
 
 // Avkryptera endpoint
-app.MapPost("/decrypt", async (HttpContext context) =>
+app.MapGet("/decrypt", async (HttpContext context) =>
 {
     var encryptedText = await new StreamReader(context.Request.Body).ReadToEndAsync();
     try
