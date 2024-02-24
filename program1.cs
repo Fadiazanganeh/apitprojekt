@@ -1,10 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.OpenApi.Models;
-using Microsoft.AspNetCore.Http;
-using System;
 using System.Text;
-using System.Linq;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,13 +24,13 @@ app.UseSwaggerUI(c =>
 var allowedWords = new[] { "hamburger", "tacos", "fries", "icecream", "candy", "popcorn" };
 
 // Krypterar endpoint
-app.MapPost("/encrypt", (EncryptionService encryptionService, string plaintext) =>
+app.MapGet("/encrypt", (EncryptionService encryptionService, string plaintext) =>
 {
     return Results.Ok(new { encryptedText = encryptionService.Encrypt(plaintext) });
 });
 
 // Avkrypterar endpoint
-app.MapPost("/decrypt", (EncryptionService encryptionService, string encryptedText) =>
+app.MapGet("/decrypt", (EncryptionService encryptionService, string encryptedText) =>
 {
     return Results.Ok(new { decryptedText = encryptionService.Decrypt(encryptedText) });
 });
